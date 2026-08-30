@@ -1,0 +1,7 @@
+[workspace]
+members = [
+    "with-trait",
+    "with-derive",
+]
+resolver = "2"
+
