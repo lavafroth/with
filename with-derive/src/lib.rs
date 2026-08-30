@@ -32,7 +32,7 @@ pub fn derive(input: TokenStream) -> TokenStream {
 
     if field_idents.is_empty() {
         return quote! {
-            impl with_trait::WithOpt for #struct_name {
+            impl ::with::WithOpt for #struct_name {
                 fn parse(args: &[&str]) -> Result<Self, String> {
                     Ok(Self {})
                 }
@@ -42,7 +42,7 @@ pub fn derive(input: TokenStream) -> TokenStream {
     }
 
     let output = quote! {
-        impl with_trait::WithOpt for #struct_name {
+        impl ::with::WithOpt for #struct_name {
             fn parse(args: &[&str]) -> Result<Self, String> {
                 use std::collections::BTreeMap;
                 let mut with_ixs = vec![];

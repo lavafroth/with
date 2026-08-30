@@ -1,7 +1,13 @@
+[package]
+name = "with"
+version = "0.1.0"
+edition = "2024"
+
 [workspace]
 members = [
-    "with-trait",
     "with-derive",
 ]
 resolver = "2"
 
+[dependencies]
+with-derive = { path = "with-derive" }

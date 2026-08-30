@@ -38,15 +38,17 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "e6e4313cd5fcd3dad5cafa179702e2b244f760991f45397d14d4ebf38247da75"
 
 [[package]]
+name = "with"
+version = "0.1.0"
+dependencies = [
+ "with-derive",
+]
+
+[[package]]
 name = "with-derive"
 version = "0.1.0"
 dependencies = [
  "proc-macro2",
  "quote",
  "syn",
- "with-trait",
 ]
-
-[[package]]
-name = "with-trait"
-version = "0.1.0"

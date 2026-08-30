@@ -1,3 +1,5 @@
+pub use with_derive::withopt;
+
 pub trait WithOpt: Sized {
     fn parse(args: &[&str]) -> Result<Self, String>;
     fn parse_args() -> Result<Self, String> {

@@ -1,5 +1,4 @@
-use with_derive::withopt;
-use with_trait::WithOpt;
+use with::{WithOpt, withopt};
 
 #[test]
 fn test_config_parse() {
