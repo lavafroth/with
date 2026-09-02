@@ -4,7 +4,10 @@
 
 A natural, speech transcription friendly way to specify command line arguments.
 
-## How They Each Read
+> [!WARNING]  
+> This library is currently in early development. Some more polish is needed for error types and input handling for production use.
+
+## Readability Comparison
 
 ### `getopt`
 
@@ -22,8 +25,6 @@ archive with create as true \
 ```
 
 > Note: the above `archive` program doesn't really exist, it's just to demonstrate the differences.
-
-Sure it's more verbose but one of them is far easier to type with speech transcription.
 
 ## Getting Started
 
@@ -56,3 +57,10 @@ fn main() {
   println!("{:?}", app);
 }
 ```
+
+## Who Is Using It
+
+Me, for now. Currently dogfooding the library to sand out edge cases. I'll maintain a list of repositories where it is used.
+
+- [takeout-transactions](https;//github.com/lavafroth/takeout-transactions)
+- _Your next project?_
