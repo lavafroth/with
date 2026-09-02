@@ -55,3 +55,48 @@ fn test_empty_struct() {
     assert!(Config::parse(superfluous).is_ok());
     assert!(Config::parse(&[]).is_ok());
 }
+
+#[test]
+fn test_optional_field() {
+    #[derive(withopt)]
+    struct Config {
+        path: String,
+        second_moment: f32,
+        verbose: Option<bool>,
+    }
+
+    assert!(
+        Config::parse(&[
+            "myprogramname",
+            "with",
+            "path",
+            "as",
+            "./example.rs",
+            "with",
+            "second",
+            "moment",
+            "as",
+            "4.1192",
+            "with",
+            "verbose",
+            "as",
+            "false"
+        ])
+        .is_ok()
+    );
+    assert!(
+        Config::parse(&[
+            "myprogramname",
+            "with",
+            "path",
+            "as",
+            "./example.rs",
+            "with",
+            "second",
+            "moment",
+            "as",
+            "4.1192",
+        ])
+        .is_ok()
+    );
+}

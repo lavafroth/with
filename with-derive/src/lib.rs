@@ -1,6 +1,8 @@
 use proc_macro::{self, TokenStream};
 use quote::quote;
-use syn::{DataStruct, DeriveInput, Fields, parse_macro_input};
+use syn::{
+    DataStruct, DeriveInput, Fields, GenericArgument, PathArguments, Type, parse_macro_input,
+};
 
 #[proc_macro_derive(withopt)]
 pub fn derive(input: TokenStream) -> TokenStream {
@@ -18,6 +20,24 @@ pub fn derive(input: TokenStream) -> TokenStream {
         }
     };
 
+    let mut opt_idents = Vec::new();
+    let mut opt_types = Vec::new();
+
+    let mut required_idents = Vec::new();
+    let mut required_types = Vec::new();
+
+    for f in fields {
+        let ident = &f.ident;
+        let (is_option, inner) = extract_option_type(&f.ty);
+        if is_option {
+            opt_idents.push(ident);
+            opt_types.push(inner);
+        } else {
+            required_idents.push(ident);
+            required_types.push(&f.ty);
+        }
+    }
+
     let field_idents: Vec<&syn::Ident> = fields
         .iter()
         .map(|f| {
@@ -26,7 +46,6 @@ pub fn derive(input: TokenStream) -> TokenStream {
                 .expect("already asserted that the struct has named fields")
         })
         .collect();
-    let field_types: Vec<&syn::Type> = fields.iter().map(|f| &f.ty).collect();
 
     let struct_name = &input.ident;
 
@@ -82,11 +101,20 @@ pub fn derive(input: TokenStream) -> TokenStream {
                 // println!("{:?}", collection);
                 Ok(Self {
                     #(
-                      #field_idents: collection.get(stringify!(#field_idents)).ok_or_else(|| {
-                          format!("missing mandatory argument {}", stringify!(#field_idents))
-                      })?.parse::<#field_types>()
-                      .map_err(|_| format!("failed to parse for field {}",
-                           stringify!(#field_idents)
+                      #opt_idents: match collection.get(stringify!(#opt_idents)) {
+                          None => None,
+                          Some(v) => Some(v.parse::<#opt_types>().map_err(|_| format!("failed to parse optional argument {}",
+                               stringify!(#opt_idents)
+                          ))?),
+                      },
+                    )*
+
+                    #(
+                      #required_idents: collection.get(stringify!(#required_idents)).ok_or_else(|| {
+                          format!("missing required argument {}", stringify!(#required_idents))
+                      })?.parse::<#required_types>()
+                      .map_err(|_| format!("failed to parse required argument {}",
+                           stringify!(#required_idents)
                       ))?,
                     )*
                 })
@@ -94,4 +122,24 @@ pub fn derive(input: TokenStream) -> TokenStream {
         }
     };
     output.into()
+}
+
+fn extract_option_type(ty: &Type) -> (bool, &Type) {
+    let default = (false, ty);
+    let Type::Path(type_path) = ty else {
+        return default;
+    };
+    let Some(segment) = type_path.path.segments.last() else {
+        return default;
+    };
+    if segment.ident != "Option" {
+        return default;
+    }
+    let PathArguments::AngleBracketed(args) = &segment.arguments else {
+        return default;
+    };
+    let Some(GenericArgument::Type(inner_type)) = args.args.first() else {
+        return default;
+    };
+    (true, inner_type)
 }
